@@ -1,0 +1,118 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2758
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 -- Creating students table\
+CREATE TABLE students (\
+    id INT PRIMARY KEY,\
+    NAME VARCHAR(255),\
+    date_of_birth DATE,\
+    grade_level INT\
+);\
+\
+-- Creating courses table\
+CREATE TABLE courses (\
+    id INT PRIMARY KEY,\
+    NAME VARCHAR(255),\
+    credits INT\
+);\
+\
+-- Creating enrollments table\
+CREATE TABLE enrollments (\
+    id INT PRIMARY KEY,\
+    student_id INT,\
+    course_id INT,\
+    FOREIGN KEY (student_id) REFERENCES students(id),\
+    FOREIGN KEY (course_id) REFERENCES courses(id)\
+);\
+\
+\
+-- Inserting sample data into students table\
+INSERT INTO students (id, NAME, date_of_birth, grade_level) VALUES\
+(1, 'John Doe', '2000-01-01', 10),\
+(2, 'Jane Smith', '2001-03-15', 11),\
+(3, 'Bob Johnson', '1999-07-22', 12);\
+\
+-- Inserting sample data into courses table\
+INSERT INTO courses (id, NAME, credits) VALUES\
+(101, 'Mathematics', 3),\
+(102, 'History', 4),\
+(103, 'Science', 3);\
+\
+-- Inserting sample data into enrollments table\
+INSERT INTO enrollments (id, student_id, course_id) VALUES\
+(1, 1, 101),\
+(2, 1, 102),\
+(3, 2, 101),\
+(4, 3, 103),\
+(5, 3, 102);\
+\
+-- Retrieve all students enrolled in a specific course\
+SELECT students.*\
+FROM students\
+JOIN enrollments ON students.id = enrollments.student_id\
+JOIN courses ON Enrollments.course_id = courses.id\
+WHERE courses.name = 'Mathematics';\
+\
+-- Find the total number of credits taken by each student.\
+SELECT students.id, students.name, SUM(courses.credits) AS total_credits\
+FROM students\
+JOIN enrollments ON Students.id = enrollments.student_id\
+JOIN courses ON enrollments.course_id = courses.id\
+GROUP BY students.id, students.name;\
+\
+-- List all courses along with the number of enrolled students.\
+SELECT courses.id, courses.name, COUNT(enrollments.student_id) AS enrolled_students\
+FROM courses\
+LEFT JOIN enrollments ON courses.id = enrollments.course_id\
+GROUP BY courses.id, courses.name;\
+\
+-- Creating departments table\
+CREATE TABLE departments (\
+    id INT PRIMARY KEY,\
+    NAME VARCHAR(255)\
+);\
+\
+\
+-- Creating teachers table\
+CREATE TABLE teachers (\
+    id INT PRIMARY KEY,\
+    NAME VARCHAR(255),\
+    department_id INT,\
+    FOREIGN KEY (department_id) REFERENCES departments(id)\
+);\
+\
+\
+-- Alter courses and add column in table\
+ALTER TABLE courses\
+ADD COLUMN teacher_id INT,\
+ADD FOREIGN KEY (teacher_id) REFERENCES teachers(id);\
+\
+-- Inserting sample data into departments table\
+INSERT INTO departments (id, NAME) VALUES\
+(1, 'Mathematics'),\
+(2, 'History'),\
+(3, 'Science');\
+\
+-- Inserting sample data into teachers table\
+INSERT INTO teachers (id, department_id, NAME) VALUES\
+(1, 1, 'Professor Smith'),\
+(2, 2, 'Dr. Johnson'),\
+(3, 1, 'Mrs. Davis');\
+\
+-- Updating courses table \
+UPDATE courses SET teacher_id = 1 WHERE id = 101;\
+UPDATE courses SET teacher_id = 2 WHERE id = 102;\
+UPDATE courses SET teacher_id = 3 WHERE id = 103;\
+\
+-- Retrieve all students enrolled in a specific course with teachers \
+SELECT students.*, courses.name, teachers.name\
+FROM students\
+JOIN enrollments ON students.id = enrollments.student_id\
+JOIN courses ON enrollments.course_id = courses.id\
+JOIN teachers ON courses.teacher_id = teachers.id\
+WHERE courses.name = 'Science';\
+}
